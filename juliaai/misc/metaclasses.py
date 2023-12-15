@@ -28,4 +28,6 @@ class MetaConfig(type):
 @dataclass
 class MetaSettings(metaclass=MetaConfig):
     agent_name: Optional[str]
+    bot_activity: Optional[str]
+    bot_activity_type: Optional[str]
     

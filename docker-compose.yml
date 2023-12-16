@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  juliaai:
+    build:
+      context: .
+    image: juliaai:latest
+    container_name: juliaai
+    restart: always
+    volumes:
+      - ./src:/app
+    environment:
+      - PYTHONPATH=/app
+      - TZ=UTC

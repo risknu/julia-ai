@@ -18,15 +18,15 @@ class BotReady(commands.Cog):
         print(f"[INFO]\tBot ready function started!\t GC:{len(self.bot.guilds)}")
         if meta_settings.bot_activity_type == "play":
             await self.bot.change_presence(activity=disnake.Game(
-                name=meta_settings.bot_activity))
+                name=meta_settings.bot_activity), status=disnake.Status.idle)
         elif meta_settings.bot_activity_type == "listen":
             await self.bot.change_presence(activity=disnake.Activity(
                 type=disnake.ActivityType.listening,
-                name=meta_settings.bot_activity))
+                name=meta_settings.bot_activity), status=disnake.Status.idle)
         elif meta_settings.bot_activity_type == "watch":
             await self.bot.change_presence(activity=disnake.Activity(
                 type=disnake.ActivityType.watching,
-                name=meta_settings.bot_activity))
+                name=meta_settings.bot_activity), status=disnake.Status.idle)
             
     @commands.command()
     async def help(self, message_ctx: disnake.Message = None) -> None:

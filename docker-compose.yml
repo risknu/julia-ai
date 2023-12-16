@@ -1,14 +1,24 @@
 version: '3'
 
 services:
-  juliaai:
+  my_service:
+    image: python:3.8
+    working_dir: /app
+    command: sh -c "pip install -r requirements.txt && python /app/run.py"
+    volumes:
+      - .:/app
+
     build:
       context: .
-    image: juliaai:latest
-    container_name: juliaai
-    restart: always
+      dockerfile: Dockerfile
+
+    depends_on:
+      - db
+
+  db:
+    image: postgres:latest
     volumes:
-      - ./src:/app
-    environment:
-      - PYTHONPATH=/app
-      - TZ=UTC
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

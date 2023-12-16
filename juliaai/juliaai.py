@@ -21,15 +21,16 @@ class JuliaAIAPI(AbstractUtilityClass):
             return
         return self.__chatbot.get_response(self._pretty_styler(response_context))
 
-    def train(self, input_data: AnyStr = None, output_data: AnyStr = None) -> None:
+    def train(self, input_data: AnyStr = None, output_data: AnyStr = None) -> bool:
         if (not input_data or not output_data) or not isinstance(input_data, str) or \
               not isinstance(output_data, str):
-            return None
+            return False
         if (input_data == ' ' or input_data == '') or (output_data == ' ' or output_data == ''):
-            return None
+            return False
         self.__trainer.train([
             self._pretty_styler(input_data),
             self._pretty_styler(output_data)])
+        return True
 
     @staticmethod
     def _pretty_styler(string: AnyStr = None) -> AnyStr:

@@ -15,7 +15,7 @@ class BotReady(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        # print(f"ready for {len(self.bot.guilds)}")
+        print(f"[INFO]\tBot ready function started!\t GC:{len(self.bot.guilds)}")
         if meta_settings.bot_activity_type == "play":
             await self.bot.change_presence(activity=disnake.Game(
                 name=meta_settings.bot_activity))

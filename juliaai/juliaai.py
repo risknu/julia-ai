@@ -1,13 +1,13 @@
 from __future__ import annotations
 
+from typing import AnyStr
+
 from chatterbot import ChatBot
 from chatterbot.trainers import ListTrainer
 
 from juliaai.utility import AbstractUtilityClass
 from juliaai.misc import MetaSettings
 meta_settings: MetaSettings = MetaSettings
-
-from typing import AnyStr
 
 
 class JuliaAIAPI(AbstractUtilityClass):

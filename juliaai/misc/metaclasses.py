@@ -33,4 +33,13 @@ class MetaSettings(metaclass=MetaConfig):
     bot_activity_type: Optional[str]
 
     command_prefix: Optional[str]
+
+    loss: Optional[str]
+    input_length: Optional[int]
+    optimizer: Optional[str]    
+    output_dim: Optional[int]
+    batch_size: Optional[int]
+    epochs: Optional[int]
+    units: Optional[int]
+    rate: Optional[float]
     

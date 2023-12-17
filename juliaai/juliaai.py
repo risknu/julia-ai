@@ -18,7 +18,7 @@ class JuliaAIAPI(AbstractUtilityClass):
 
     def response(self, response_context: AnyStr = None) -> AnyStr:
         if not response_context or not isinstance(response_context, str):
-            return
+            return None
         return self.__chatbot.get_response(self._pretty_styler(response_context))
 
     def train(self, input_data: AnyStr = None, output_data: AnyStr = None) -> bool:

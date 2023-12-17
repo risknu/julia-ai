@@ -29,7 +29,44 @@ class JuliaAPI(commands.Cog):
         self.bot: commands.Bot = bot
         self.julia_api: JuliaAIAPI = JuliaAIAPI()
 
-    @commands.slash_command(description="parsechannel")
+    @commands.Cog.listener()
+    async def on_message(self, message: disnake.Message = None) -> None:
+        if message.author == self.bot.user:
+            return
+        
+        if message.reference:
+            referenced_message = await message.channel.fetch_message(message.reference.message_id)
+            self.julia_api.train(referenced_message.content, message.content)
+        if self.bot.user.mentioned_in(message) or isinstance(message.channel, disnake.DMChannel):
+            await message.reply(self.julia_api.response(message.content))
+        await self.bot.process_commands(message)
+
+    @commands.slash_command(description="You can write SQL code in Discord, BE CAUTIOUS")
+    async def sqlin(self, interaction: disnake.ApplicationCommandInteraction = None,
+                           code: str = None) -> None:
+        await interaction.response.defer()
+        if not code or not interaction.author.guild_permissions.administrator:
+            await interaction.edit_original_response('It seems you don\'t have the specified channel, or you don\'t have the permission to parse the Discord channel `channel`\n You can learn more in the `>help` menu')
+            return
+        async with interaction.channel.typing():
+            await asyncio.sleep(1)
+        if not path.exists('db.sqlite3'):
+            return
+        try:
+            connection = sqlite3.connect('db.sqlite3')
+            cursor = connection.cursor()
+            cursor.execute(code)
+            execute_output = cursor.fetchone()[0]
+        except Exception as e:
+            await interaction.edit_original_response(f'*Input SQL code*\n```sql\n{code}```\n*Output*\n```bash\n> {e}\n```')
+            cursor.close()
+            connection.close()
+            return
+        cursor.close()
+        connection.close()
+        await interaction.edit_original_response(f'*Input SQL code*\n```sql\n{code}\n```\n*Output*\n```bash\n> {execute_output}\n```')
+
+    @commands.slash_command(description="You can parse data from the chat with the required number of messages for parsing")
     async def parsechannel(self, interaction: disnake.ApplicationCommandInteraction = None,
                            channel: disnake.TextChannel = None,
                            amount: int = 2) -> None:
@@ -40,10 +77,10 @@ class JuliaAPI(commands.Cog):
         async for message in channel.history(limit=int(amount)):
             if message.type == disnake.MessageType.reply:
                 async with interaction.channel.typing():
-                    asyncio.sleep(2)
+                    await asyncio.sleep(2)
                 replied_message = await channel.fetch_message(message.reference.message_id)
                 self.julia_api.train(replied_message.content, message.content)
-                await interaction.edit_original_response(content=f'I trained the neural network on the {channel.mention} channel, and now you can communicate as in the channel from `{amount}` messages\nYou can learn more by typing the command `?help` for more information')
+                await interaction.edit_original_response(content=f'{interaction.user.mention} trained the neural network on the {channel.mention} channel, and now you can communicate as in the channel from `{amount}` messages\nYou can learn more by typing the command `?help` for more information')
 
     @commands.slash_command(description="You can create a demotivator for yourself on any topic you want and with any person you like")
     async def demotivator(self, interaction: disnake.ApplicationCommandInteraction = None,
@@ -52,6 +89,7 @@ class JuliaAPI(commands.Cog):
         await interaction.response.defer()
         if not member or not title:
             await interaction.edit_original_response("You did not specify a user or a topic for which you want to create a demotivator\nFor more commands, refer to our menu using `?help`")
+            return
         async with interaction.channel.typing():
             await asyncio.sleep(2)
         with ThreadPoolExecutor() as executor:
@@ -78,6 +116,8 @@ class JuliaAPI(commands.Cog):
         query: str = f"SELECT COUNT(*) FROM statement;"
         cursor.execute(query)
         row_count = cursor.fetchone()[0]
+        cursor.close()
+        connection.close()
         await interaction.edit_original_response(f'The amount of data for training the chatbot is `{row_count}`\nUse our help command `?help` for other commands')
 
     @commands.slash_command(description="You can train the neural network on your data that you can provide to us")
@@ -100,6 +140,5 @@ class JuliaAPI(commands.Cog):
             await asyncio.sleep(1)
         await interaction.edit_original_response(f'{interaction.user.mention}, You have successfully trained the neural network to respond `{output_sentence}` to the input `{input_sentence}`\nFor more commands, use :: `?help`')
     
-
 def setup(bot: commands.Bot = None) -> None:
     bot.add_cog(JuliaAPI(bot))

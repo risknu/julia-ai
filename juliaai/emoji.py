@@ -18,9 +18,14 @@ from keras.layers import Embedding, LSTM, Dense, Bidirectional, Dropout
 
 
 class BidirectionalLSTM_EmojiClassifier(AbstractUtilityClass):
-    def __init__(self) -> None:
+    def __init__(self, data_set: list[dict] = None) -> None:
         super().__init__()
-        self.data: list = [{"text": "hi", "emoji": 0}, {"text": "lol", "emoji": 1}]
+        self.setup_new(data_set)
+
+    def setup_new(self, data_set: list[dict] = None) -> None:
+        with open('emojis.json', 'r') as fileIOemojisR:
+            emoji_data_file: list[dict] = json.load(fileIOemojisR)
+        self.data: list = emoji_data_file if not data_set else data_set
 
         self.texts: list = [item["text"] for item in self.data]
         self.labels: list = [item["emoji"] for item in self.data]
